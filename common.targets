@@ -1,9 +1,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!--common project properties-->
   <PropertyGroup>
-    <Authors>spacechase0</Authors>
+    <Authors>Shivion</Authors>
     <Description>...</Description>
-    <UniqueId>spacechase0.$(AssemblyName)</UniqueId>
+    <UniqueId>shivion.$(AssemblyName)</UniqueId>
 
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 

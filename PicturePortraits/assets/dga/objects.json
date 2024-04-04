@@ -1,8 +1,0 @@
-﻿[
-    {
-        "ID": "Film",
-        "Category": "Junk",
-        "Texture": "objects.png:0",
-        "HideFromShippingCollection": true
-    }
-]

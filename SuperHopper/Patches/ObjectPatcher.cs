@@ -44,9 +44,9 @@ namespace SuperHopper.Patches
         ** Private methods
         *********/
         /// <summary>The method to call after <see cref="SObject.minutesElapsed"/>.</summary>
-        private static void After_MinutesElapsed(SObject __instance, GameLocation environment)
+        private static void After_MinutesElapsed(SObject __instance)
         {
-            ObjectPatcher.OnMachineMinutesElapsed(__instance, environment);
+            ObjectPatcher.OnMachineMinutesElapsed(__instance, __instance.Location);
         }
     }
 }

@@ -4,6 +4,7 @@ using SpaceShared;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.Objects;
 using SuperHopper.Patches;
 using SObject = StardewValley.Object;
@@ -71,7 +72,7 @@ namespace SuperHopper
                     chest.heldObject.Value = null;
                     chest.modData.Remove(this.ModDataFlag);
 
-                    Game1.player.addItemToInventory(new SObject(SObject.iridiumBar, 1));
+                    Game1.player.addItemToInventory(new SObject(SObject.iridiumBarID, 1));
 
                     Game1.playSound("shiny4");
                 }
@@ -109,14 +110,45 @@ namespace SuperHopper
             if (!location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out SObject objAbove) || objAbove is not Chest chestAbove)
                 return;
 
+            //check for side chest
+            location.objects.TryGetValue(hopper.TileLocation - new Vector2(1, 0), out SObject objRight);
+            location.objects.TryGetValue(hopper.TileLocation - new Vector2(-1, 0), out SObject objLeft);
+
+
             // transfer items
             chestAbove.clearNulls();
             var chestAboveItems = chestAbove.GetItemsForPlayer(hopper.owner.Value);
             for (int i = chestAboveItems.Count - 1; i >= 0; i--)
             {
-                Item item = chestAboveItems[i];
-                if (chestBelow.addItem(item) == null)
-                    chestAboveItems.RemoveAt(i);
+                IInventory chestFilterItems = new Inventory();
+                if (objRight is Chest chestRight)
+                {
+                    chestFilterItems.AddRange(chestRight.GetItemsForPlayer(hopper.owner.Value));
+                }
+                if (objLeft is Chest chestLeft)
+                {
+                    chestFilterItems.AddRange(chestLeft.GetItemsForPlayer(hopper.owner.Value));
+                }
+
+                if (chestFilterItems != null)
+                {
+                    for (int j = chestFilterItems.Count - 1; j >= 0; j--)
+                    {
+                        if (chestFilterItems[j].ItemId == chestAboveItems[i].ItemId)
+                        {
+                            Item item = chestAboveItems[i];
+                            if (chestBelow.addItem(item) == null)
+                                chestAboveItems.RemoveAt(i);
+                        }
+                        break;
+                    }
+                }
+                else
+                {
+                    Item item = chestAboveItems[i];
+                    if (chestBelow.addItem(item) == null)
+                        chestAboveItems.RemoveAt(i);
+                }
             }
         }
 

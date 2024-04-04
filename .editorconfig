@@ -11,6 +11,24 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 charset = utf-8
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
+end_of_line = crlf
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:silent
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_prefer_conditional_expression_over_assignment = true:silent
+dotnet_style_prefer_conditional_expression_over_return = true:silent
+dotnet_style_explicit_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+dotnet_style_prefer_compound_assignment = true:suggestion
+dotnet_style_prefer_simplified_interpolation = true:suggestion
+dotnet_style_namespace_match_folder = true:suggestion
 
 [*.{csproj,nuspec,targets}]
 indent_size = 2
@@ -65,7 +83,7 @@ csharp_style_expression_bodied_accessors = true:suggestion
 csharp_style_inlined_variable_declaration = true:warning
 
 # avoid superfluous braces
-csharp_prefer_braces = false:hint
+csharp_prefer_braces = true:silent
 
 # naming conventions
 dotnet_naming_style.pascal_case_style.capitalization=pascal_case
@@ -74,13 +92,28 @@ dotnet_naming_symbols.pascal_types.applicable_kinds=namespace, class, struct, in
 dotnet_naming_symbols.pascal_types.applicable_accessibilities=*
 
 dotnet_naming_rule.most_identifiers_should_be_pascal_case.symbols=pascal_types
-dotnet_naming_rule.most_identifiers_should_be_pascal_case.style=pascal_case_style
-dotnet_naming_rule.most_identifiers_should_be_pascal_case.severity=warning
+dotnet_naming_rule.most_identifiers_should_be_pascal_case.style = pascal_case_style
+dotnet_naming_rule.most_identifiers_should_be_pascal_case.severity = warning
 
 # configure stricter code analysis warnings
 # documentation: https://docs.microsoft.com/en-ca/dotnet/fundamentals/code-analysis/categories
 dotnet_diagnostic.CA1001.severity = error # Types that own disposable fields should be disposable
 dotnet_diagnostic.CA2000.severity = error # Dispose objects before losing scope
+csharp_indent_labels = one_less_than_current
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_throw_expression = true:suggestion
+csharp_style_prefer_null_check_over_type_check = true:suggestion
+csharp_style_prefer_local_over_anonymous_function = true:suggestion
+csharp_style_prefer_index_operator = true:suggestion
+csharp_space_around_binary_operators = before_and_after
 
 ##########
 ## Column guidelines
