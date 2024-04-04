@@ -14,11 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{622B2762
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SpaceShared", "SpaceShared\SpaceShared.shproj", "{061610A4-7D02-4F52-A921-F59ED123C2A9}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "internal", "{DED81BB3-A571-46E2-91C2-6A8B7890C7EA}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SpaceSharedPatching", "SpaceSharedPatching\SpaceSharedPatching.shproj", "{A87F5D49-6246-4B14-8363-114DC9335C2C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperFilteredHopper", "SuperHopper\SuperFilteredHopper.csproj", "{D93E668B-6C2A-470C-B9D3-AB86BD3A1E99}"
 EndProject
@@ -36,17 +32,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{061610A4-7D02-4F52-A921-F59ED123C2A9} = {DED81BB3-A571-46E2-91C2-6A8B7890C7EA}
-		{A87F5D49-6246-4B14-8363-114DC9335C2C} = {DED81BB3-A571-46E2-91C2-6A8B7890C7EA}
-	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {38EB01DD-BAE8-4977-9815-463F5F434FBF}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		SpaceShared\SpaceShared.projitems*{061610a4-7d02-4f52-a921-f59ed123c2a9}*SharedItemsImports = 13
-		SpaceSharedPatching\SpaceSharedPatching.projitems*{a87f5d49-6246-4b14-8363-114dc9335c2c}*SharedItemsImports = 13
-		SpaceSharedPatching\SpaceSharedPatching.projitems*{d93e668b-6c2a-470c-b9d3-ab86bd3a1e99}*SharedItemsImports = 5
-		SpaceShared\SpaceShared.projitems*{d93e668b-6c2a-470c-b9d3-ab86bd3a1e99}*SharedItemsImports = 5
 	EndGlobalSection
 EndGlobal
