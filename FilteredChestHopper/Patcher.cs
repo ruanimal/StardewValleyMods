@@ -1,12 +1,10 @@
 using System;
-using System.Reflection;
 using HarmonyLib;
 
 namespace FilteredChestHopper
 {
     internal class Patcher
     {
-        /// <summary>The method to call after a machine updates on time change.</summary>
         private static Action<StardewValley.Object> OnMachineMinutesElapsed;
 
         public Patcher(Action<StardewValley.Object> onMachineMinutesElapsed)

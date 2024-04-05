@@ -7,9 +7,9 @@ namespace FilteredChestHopper
 {
     internal class Mod : StardewModdingAPI.Mod
     {
-        /*********
-        ** Public methods
-        *********/
+        //Applying this flag gets automate to ignore the hopper, so I hijack it
+        private readonly string ModDataFlag = "spacechase0.SuperHopper";
+
         public override void Entry(IModHelper helper)
         {
             new Patcher(this.OnMinutesElapsed);
@@ -24,12 +24,19 @@ namespace FilteredChestHopper
 
             // check for bottom chest
             if (!__instance.Location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out StardewValley.Object objBelow) || objBelow is not Chest chestBelow)
+            {
+                hopper.modData.Remove(this.ModDataFlag);
                 return;
+            }
 
             // check for top chest
             if (!__instance.Location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out StardewValley.Object objAbove) || objAbove is not Chest chestAbove)
+            {
+                hopper.modData.Remove(this.ModDataFlag);
                 return;
+            }
 
+            hopper.modData[this.ModDataFlag] = "1";
 
             // transfer items
             chestAbove.clearNulls();
