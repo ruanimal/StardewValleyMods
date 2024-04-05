@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_root", "_root", "{622B2762
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "internal", "internal", "{DED81BB3-A571-46E2-91C2-6A8B7890C7EA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperFilteredHopper", "SuperHopper\SuperFilteredHopper.csproj", "{D93E668B-6C2A-470C-B9D3-AB86BD3A1E99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FilteredChestHopper", "FilteredChestHopper\FilteredChestHopper.csproj", "{D93E668B-6C2A-470C-B9D3-AB86BD3A1E99}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

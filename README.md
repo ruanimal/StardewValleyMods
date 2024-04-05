@@ -1,7 +1,5 @@
-﻿This repository contains my SMAPI mods for Stardew Valley and
-spacechase0's shared internals because I used his as a base.
-See the individual mods in the subfolders for documentation
-and release notes.
+﻿This repository contains my SMAPI mods for Stardew Valley based on spacechase0's mods.
+See the individual mods in the subfolders for documentation and release notes.
 
 ## Compiling the mods
 Installing stable releases from Nexus Mods is recommended for most users. If you really want to

@@ -2,39 +2,32 @@ using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Objects;
-using SObject = StardewValley.Object;
-using HarmonyLib;
 
-namespace FilteredHopper
+namespace FilteredChestHopper
 {
     internal class Mod : StardewModdingAPI.Mod
     {
         /*********
         ** Public methods
         *********/
-        /// <inheritdoc/>
         public override void Entry(IModHelper helper)
         {
-            Harmony harmony = new(ModManifest.UniqueID);
-            harmony.PatchAll();
-            harmony.Patch(original: AccessTools.Method(typeof(SObject), nameof(SObject.minutesElapsed), null, null), postfix: new HarmonyMethod(AccessTools.Method(this.GetType(), nameof(OnMachineMinutesElapsed))));
+            new Patcher(this.OnMinutesElapsed);
+            Patcher.Patch(ModManifest.UniqueID);
         }
 
-        /// <summary>Called after a machine updates on time change.</summary>
-        /// <param name="machine">The machine that updated.</param>
-        /// <param name="location">The location containing the machine.</param>
-        private void OnMachineMinutesElapsed(SObject machine, GameLocation location)
+        private void OnMinutesElapsed(StardewValley.Object __instance)
         {
             // not hopper
-            if (!this.TryGetHopper(machine, out Chest hopper))
-                return;
+            if (!this.TryGetHopper(__instance, out Chest hopper))
+            return;
 
             // check for bottom chest
-            if (!location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out SObject objBelow) || objBelow is not Chest chestBelow)
+            if (!__instance.Location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out StardewValley.Object objBelow) || objBelow is not Chest chestBelow)
                 return;
 
             // check for top chest
-            if (!location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out SObject objAbove) || objAbove is not Chest chestAbove)
+            if (!__instance.Location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out StardewValley.Object objAbove) || objAbove is not Chest chestAbove)
                 return;
 
 
@@ -70,7 +63,7 @@ namespace FilteredHopper
         /// <param name="obj">The object to check.</param>
         /// <param name="hopper">The hopper instance.</param>
         /// <returns>Returns whether the object is a hopper.</returns>
-        private bool TryGetHopper(SObject obj, out Chest hopper)
+        private bool TryGetHopper(StardewValley.Object obj, out Chest hopper)
         {
             if (obj is Chest { SpecialChestType: Chest.SpecialChestTypes.AutoLoader } chest)
             {
