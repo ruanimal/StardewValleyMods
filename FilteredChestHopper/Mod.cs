@@ -1,67 +1,119 @@
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
 
+//To-Do
+//Figure out how to read automate config?
+//Copy automates connecting with paths?
+
 namespace FilteredChestHopper
 {
+
     internal class Mod : StardewModdingAPI.Mod
     {
+        public int AutomationInterval { get; set; } = 60;
+        public int AutomateCountdown;
+
+        //Active Pipelines
+        public static List<Pipeline> Pipelines;
+
         //Applying this flag gets automate to ignore the hopper, so I hijack it
-        private readonly string ModDataFlag = "spacechase0.SuperHopper";
+        public const string ModDataFlag = "spacechase0.SuperHopper";
 
         public override void Entry(IModHelper helper)
         {
-            new Patcher(this.OnMinutesElapsed);
-            Patcher.Patch(ModManifest.UniqueID);
+            helper.Events.GameLoop.UpdateTicked += this.UpdateTicked;
+            helper.Events.GameLoop.SaveLoaded += this.SaveLoaded;
+            helper.Events.GameLoop.GameLaunched += this.GameLaunched;
+            helper.Events.World.ObjectListChanged += this.ObjectListChanged;
         }
 
-        private void OnMinutesElapsed(StardewValley.Object __instance)
+        private void GameLaunched(object sender, GameLaunchedEventArgs e)
         {
-            // not hopper
-            if (!this.TryGetHopper(__instance, out Chest hopper))
-            return;
-
-            // check for bottom chest
-            if (!__instance.Location.objects.TryGetValue(hopper.TileLocation + new Vector2(0, 1), out StardewValley.Object objBelow) || objBelow is not Chest chestBelow)
+            if (Pipelines == null)
             {
-                hopper.modData.Remove(this.ModDataFlag);
-                return;
+                Pipelines = new List<Pipeline>();
             }
+        }
 
-            // check for top chest
-            if (!__instance.Location.objects.TryGetValue(hopper.TileLocation - new Vector2(0, 1), out StardewValley.Object objAbove) || objAbove is not Chest chestAbove)
+        private void SaveLoaded(object sender, SaveLoadedEventArgs e)
+        {
+            RegeneratePipelines();
+        }
+
+        public void RegeneratePipelines()
+        {
+            foreach (var location in Game1.locations)
             {
-                hopper.modData.Remove(this.ModDataFlag);
-                return;
-            }
-
-            hopper.modData[this.ModDataFlag] = "1";
-
-            // transfer items
-            chestAbove.clearNulls();
-            var chestAboveItems = chestAbove.GetItemsForPlayer(hopper.owner.Value);
-            var filterItems = hopper.GetItemsForPlayer(hopper.owner.Value);
-            for (int i = chestAboveItems.Count - 1; i >= 0; i--)
-            {
-                bool match = true;
-                for (int j = filterItems.Count - 1; j >= 0; j--)
+                foreach (var stardewObject in location.objects.Pairs)
                 {
-                    if (filterItems[j].ItemId == chestAboveItems[i].ItemId)
+                    if (TryGetHopper(stardewObject.Value, out var hopper) && !hopper.modData.ContainsKey(ModDataFlag))
                     {
-                        match = true;
-                        break;
-                    }
-                    else
-                    {
-                        match = false;
+                        Pipeline pipeline = new Pipeline(hopper);
+                        Pipelines.Add(pipeline);
                     }
                 }
-                if(match)
+            }
+        }
+            
+
+        private void ObjectListChanged(object sender, ObjectListChangedEventArgs e)
+        {
+            if (e.Removed != null)
+            {
+                foreach (var RemovedObject in e.Removed)
                 {
-                    Item item = chestAboveItems[i];
-                    if (chestBelow.addItem(item) == null)
-                        chestAboveItems.RemoveAt(i);
+                    if (RemovedObject.Value is Chest)
+                    {
+                        Pipelines.RemoveAll(pipeline => CheckIfInBounds(RemovedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
+
+                        Chest chestAbove = GetChestAt(e.Location, RemovedObject.Key - new Vector2(1, 0));
+                        if (chestAbove != null && TryGetHopper(chestAbove, out var hopperAbove))
+                        {
+                            Pipeline pipeline = new Pipeline(hopperAbove);
+                            Pipelines.Add(pipeline);
+                        }
+
+                        Chest chestBelow = GetChestAt(e.Location, RemovedObject.Key + new Vector2(1, 0));
+                        if (chestBelow != null && TryGetHopper(chestBelow, out var hopperBelow))
+                        {
+                            Pipeline pipeline = new Pipeline(hopperBelow);
+                            Pipelines.Add(pipeline);
+                        }
+                    }
+                }
+            }
+
+            if (e.Added != null)
+            {
+                foreach (var AddedObject in e.Added)
+                {
+                    if (AddedObject.Value is Chest)
+                    {
+                        Pipelines.RemoveAll(pipeline => CheckIfInBounds(AddedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
+                        Pipeline pipeline = new Pipeline((Chest)AddedObject.Value);
+                        Pipelines.Add(pipeline);
+                    }
+                }
+            }
+        }
+
+        private void UpdateTicked(object sender, UpdateTickedEventArgs e)
+        {
+            this.AutomateCountdown--;
+            if (this.AutomateCountdown > 0)
+                return;
+
+            this.AutomateCountdown = AutomationInterval;
+
+            if (Pipelines != null)
+            { 
+                foreach (var pipeline in Pipelines)
+                {
+                    pipeline.AttemptTransfer();
                 }
             }
         }
@@ -70,7 +122,7 @@ namespace FilteredChestHopper
         /// <param name="obj">The object to check.</param>
         /// <param name="hopper">The hopper instance.</param>
         /// <returns>Returns whether the object is a hopper.</returns>
-        private bool TryGetHopper(StardewValley.Object obj, out Chest hopper)
+        public static bool TryGetHopper(StardewValley.Object obj, out Chest hopper)
         {
             if (obj is Chest { SpecialChestType: Chest.SpecialChestTypes.AutoLoader } chest)
             {
@@ -80,6 +132,21 @@ namespace FilteredChestHopper
 
             hopper = null;
             return false;
+        }
+
+        //Will be used to limit regenerating unchanged pipelines
+        private bool CheckIfInBounds(Vector2 point, Vector2 boundsStart, Vector2 boundsSize)
+        {
+            return point.X >= boundsStart.X && point.X <= boundsStart.X + boundsSize.X && point.Y >= boundsStart.Y && point.Y <= boundsStart.Y + boundsSize.Y;
+        }
+
+        public static Chest GetChestAt(GameLocation location, Vector2 position)
+        {
+            if (location.objects.TryGetValue(position, out StardewValley.Object obj) && obj != null && obj is Chest chest)
+            {
+                return chest;
+            }
+            return null;
         }
     }
 }
