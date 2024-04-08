@@ -50,7 +50,7 @@ namespace FilteredChestHopper
             {
                 foreach (var stardewObject in location.objects.Pairs)
                 {
-                    if (TryGetHopper(stardewObject.Value, out var hopper) && !hopper.modData.ContainsKey(ModDataFlag))
+                    if (TryGetHopper(stardewObject.Value, out var hopper))
                     {
                         Pipeline pipeline = new Pipeline(hopper);
                         Pipelines.Add(pipeline);
