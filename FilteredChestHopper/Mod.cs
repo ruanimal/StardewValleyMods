@@ -66,21 +66,21 @@ namespace FilteredChestHopper
             {
                 foreach (var RemovedObject in e.Removed)
                 {
-                    if (RemovedObject.Value is Chest)
+                    if (TryGetHopper(RemovedObject.Value, out Chest hopper))
                     {
                         Pipelines.RemoveAll(pipeline => CheckIfInBounds(RemovedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
 
-                        Chest chestAbove = GetChestAt(e.Location, RemovedObject.Key - new Vector2(1, 0));
-                        if (chestAbove != null && TryGetHopper(chestAbove, out var hopperAbove))
+                        Chest chestLeft = GetChestAt(e.Location, RemovedObject.Key - new Vector2(1, 0));
+                        if (chestLeft != null && TryGetHopper(chestLeft, out var hopperLeft))
                         {
-                            Pipeline pipeline = new Pipeline(hopperAbove);
+                            Pipeline pipeline = new Pipeline(hopperLeft);
                             Pipelines.Add(pipeline);
                         }
 
-                        Chest chestBelow = GetChestAt(e.Location, RemovedObject.Key + new Vector2(1, 0));
-                        if (chestBelow != null && TryGetHopper(chestBelow, out var hopperBelow))
+                        Chest chestRight = GetChestAt(e.Location, RemovedObject.Key + new Vector2(1, 0));
+                        if (chestRight != null && TryGetHopper(chestRight, out var hopperRight))
                         {
-                            Pipeline pipeline = new Pipeline(hopperBelow);
+                            Pipeline pipeline = new Pipeline(hopperRight);
                             Pipelines.Add(pipeline);
                         }
                     }
@@ -91,10 +91,10 @@ namespace FilteredChestHopper
             {
                 foreach (var AddedObject in e.Added)
                 {
-                    if (AddedObject.Value is Chest)
+                    if (TryGetHopper(AddedObject.Value, out Chest hopper))
                     {
                         Pipelines.RemoveAll(pipeline => CheckIfInBounds(AddedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
-                        Pipeline pipeline = new Pipeline((Chest)AddedObject.Value);
+                        Pipeline pipeline = new Pipeline(hopper);
                         Pipelines.Add(pipeline);
                     }
                 }
