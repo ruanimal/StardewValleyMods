@@ -2,28 +2,26 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
+using static HarmonyLib.Code;
 
 namespace FilteredChestHopper
 {
     internal class Pipeline
     {
-        //position of the left most hopper
-        internal Vector2 Position;
-        //width of the pipeline
-        internal int Width;
+        public List<Chest> Hoppers;
         //location
         internal GameLocation Location;
 
         public Pipeline(Chest originHopper)
         {
-            Position = originHopper.TileLocation;
-            Width = 1;
             Location = originHopper.Location;
 
             originHopper.modData[Mod.ModDataFlag] = "1";
 
             CheckSideHoppers(new Vector2(1, 0), originHopper);
             CheckSideHoppers(new Vector2(-1, 0), originHopper);
+
+            Hoppers.Sort(new ChestLeftToRight());
         }
 
         //Checks adjacent hoppers for expansion
@@ -44,12 +42,7 @@ namespace FilteredChestHopper
         internal void ExpandPipeline(Chest hopper)
         {
             //Expand Pipeline
-            if(hopper.TileLocation.X < Position.X)
-            {
-                Position = hopper.TileLocation;
-            }
-            Width += 1;
-
+            Hoppers.Add(hopper);
             hopper.modData[Mod.ModDataFlag] = "1";
         }
 
@@ -58,18 +51,18 @@ namespace FilteredChestHopper
         {
             List<Chest> inputChests = new List<Chest>();
             List<Chest[]> outputChests = new List<Chest[]>();
-            for (int i = 0; i < Width; i++)
+            for (int i = 0; i < Hoppers.Count; i++)
             {
-                Chest inputChest = Mod.GetChestAt(Location, Position + new Vector2(i, -1));
+                Chest inputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation);
                 if (inputChest != null)
                 {
                     inputChests.Add(inputChest);
                 }
 
-                Chest outputChest = Mod.GetChestAt(Location, Position + new Vector2(i, 1));
+                Chest outputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation);
                 if (outputChest != null)
                 {
-                    outputChests.Add(new Chest[] { Mod.GetChestAt(Location, Position + new Vector2(i, 0)), outputChest});
+                    outputChests.Add(new Chest[] { Hoppers[i], outputChest});
                 }
             }
 
@@ -98,11 +91,19 @@ namespace FilteredChestHopper
                         if (match)
                         {
                             Item item = chestAboveItems[i];
-                            if (outputChest[1].addItem(item) == null)
+                            if (Utility.addItemToThisInventoryList(item, outputChest[i].Items) == null)
                                 chestAboveItems.RemoveAt(i);
                         }
                     }
                 }
+            }
+        }
+
+        public class ChestLeftToRight : Comparer<Chest>
+        {
+            public override int Compare(Chest x, Chest y)
+            {
+                return x.TileLocation.X.CompareTo(y.TileLocation.X);
             }
         }
     }

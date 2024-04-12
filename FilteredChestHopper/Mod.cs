@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -46,7 +47,7 @@ namespace FilteredChestHopper
 
         public void RegeneratePipelines()
         {
-            foreach (var location in Game1.locations)
+            Utility.ForEachLocation((GameLocation location) =>
             {
                 foreach (var stardewObject in location.objects.Pairs)
                 {
@@ -56,7 +57,8 @@ namespace FilteredChestHopper
                         Pipelines.Add(pipeline);
                     }
                 }
-            }
+                return true;
+            });
         }
             
 
@@ -68,7 +70,7 @@ namespace FilteredChestHopper
                 {
                     if (TryGetHopper(RemovedObject.Value, out Chest hopper))
                     {
-                        Pipelines.RemoveAll(pipeline => CheckIfInBounds(RemovedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
+                        Pipelines.RemoveAll(pipeline => pipeline.Hoppers.Contains(hopper));
 
                         Chest chestLeft = GetChestAt(e.Location, RemovedObject.Key - new Vector2(1, 0));
                         if (chestLeft != null && TryGetHopper(chestLeft, out var hopperLeft))
@@ -93,7 +95,7 @@ namespace FilteredChestHopper
                 {
                     if (TryGetHopper(AddedObject.Value, out Chest hopper))
                     {
-                        Pipelines.RemoveAll(pipeline => CheckIfInBounds(AddedObject.Key, pipeline.Position - new Vector2(1, 0), new Vector2(pipeline.Width + 2, 0)));
+                        Pipelines.RemoveAll(pipeline => AddedObject.Key == pipeline.Hoppers[0].TileLocation - new Vector2(1,0) || AddedObject.Key == pipeline.Hoppers[pipeline.Hoppers.Count - 1].TileLocation + new Vector2(1, 0));
                         Pipeline pipeline = new Pipeline(hopper);
                         Pipelines.Add(pipeline);
                     }
