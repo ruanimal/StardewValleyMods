@@ -2,13 +2,11 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.Objects;
-using static HarmonyLib.Code;
-
 namespace FilteredChestHopper
 {
     internal class Pipeline
     {
-        public List<Chest> Hoppers;
+        public List<Chest> Hoppers = new List<Chest>();
         //location
         internal GameLocation Location;
 
@@ -17,6 +15,8 @@ namespace FilteredChestHopper
             Location = originHopper.Location;
 
             originHopper.modData[Mod.ModDataFlag] = "1";
+
+            Hoppers.Add(originHopper);
 
             CheckSideHoppers(new Vector2(1, 0), originHopper);
             CheckSideHoppers(new Vector2(-1, 0), originHopper);
@@ -47,19 +47,19 @@ namespace FilteredChestHopper
         }
 
         //Attempt to output with this hopper as a filter
-        public void AttemptTransfer()
+        public void AttemptTransfer(Mod mod)
         {
             List<Chest> inputChests = new List<Chest>();
             List<Chest[]> outputChests = new List<Chest[]>();
             for (int i = 0; i < Hoppers.Count; i++)
             {
-                Chest inputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation);
+                Chest inputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation - new Vector2(0,1));
                 if (inputChest != null)
                 {
                     inputChests.Add(inputChest);
                 }
 
-                Chest outputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation);
+                Chest outputChest = Mod.GetChestAt(Location, Hoppers[i].TileLocation + new Vector2(0, 1));
                 if (outputChest != null)
                 {
                     outputChests.Add(new Chest[] { Hoppers[i], outputChest});
@@ -78,7 +78,7 @@ namespace FilteredChestHopper
                         bool match = true;
                         for (int j = filterItems.Count - 1; j >= 0; j--)
                         {
-                            if (filterItems[j].ItemId == chestAboveItems[i].ItemId)
+                            if (filterItems[j].ItemId == chestAboveItems[i].ItemId && ( !mod.Config.CompareQuality || filterItems[j].Quality == chestAboveItems[i].Quality))
                             {
                                 match = true;
                                 break;
@@ -91,8 +91,10 @@ namespace FilteredChestHopper
                         if (match)
                         {
                             Item item = chestAboveItems[i];
-                            if (Utility.addItemToThisInventoryList(item, outputChest[i].Items) == null)
+                            if (outputChest[1].addItem(item) == null)
+                            {
                                 chestAboveItems.RemoveAt(i);
+                            }
                         }
                     }
                 }
