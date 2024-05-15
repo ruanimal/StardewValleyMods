@@ -78,15 +78,18 @@ namespace FilteredChestHopper
                         bool match = true;
                         for (int j = filterItems.Count - 1; j >= 0; j--)
                         {
-                            if (filterItems[j].ItemId == chestAboveItems[i].ItemId && ( !mod.Config.CompareQuality || filterItems[j].Quality == chestAboveItems[i].Quality))
+                            if (filterItems[j].ItemId == chestAboveItems[i].ItemId && ( !(mod.Config.CompareQuality && filterItems[j].Stack == 3) ||
+                                    filterItems[j].Quality == chestAboveItems[i].Quality))
                             {
                                 match = true;
                                 break;
                             }
-                            else
+                            if (mod.Config.FilterByCategory && filterItems[j].Stack == 2 && filterItems[j].Category == chestAboveItems[i].Category)
                             {
-                                match = false;
+                                match = true;
+                                break;
                             }
+                            match = false;
                         }
                         if (match)
                         {

@@ -62,6 +62,14 @@ namespace FilteredChestHopper
                 setValue: value => this.Config.CompareQuality = value
             );
 
+            configMenu.AddBoolOption(
+                mod: this.ModManifest,
+                name: () => "Filter By Category",
+                tooltip: () => "If true the filters will check the category of items when the stack of item is 2.",
+                getValue: () => this.Config.FilterByCategory,
+                setValue: value => this.Config.FilterByCategory = value
+            );
+
             configMenu.AddNumberOption(
                 mod: this.ModManifest,
                 name: () => "Tranfer Interval",
@@ -93,7 +101,7 @@ namespace FilteredChestHopper
                 return true;
             });
         }
-            
+
 
         private void ObjectListChanged(object sender, ObjectListChangedEventArgs e)
         {
@@ -145,7 +153,7 @@ namespace FilteredChestHopper
             this.AutomateCountdown = Config.TransferInterval;
 
             if (Pipelines != null)
-            { 
+            {
                 foreach (var pipeline in Pipelines)
                 {
                     pipeline.AttemptTransfer(this);
