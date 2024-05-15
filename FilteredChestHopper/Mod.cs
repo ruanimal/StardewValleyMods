@@ -30,6 +30,8 @@ namespace FilteredChestHopper
             helper.Events.GameLoop.SaveLoaded += this.SaveLoaded;
             helper.Events.GameLoop.GameLaunched += this.GameLaunched;
             helper.Events.World.ObjectListChanged += this.ObjectListChanged;
+
+            this.Config = this.Helper.ReadConfig<ModConfig>();
         }
 
         private void GameLaunched(object sender, GameLaunchedEventArgs e)
